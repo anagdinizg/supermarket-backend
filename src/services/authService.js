@@ -1,4 +1,5 @@
 import User from "../models/User.js";
+
 import { generateToken } from "../middleware/authMiddleware.js";
 
 class AuthService {
@@ -11,12 +12,20 @@ class AuthService {
       error.statusCode = 400;
       throw error;
     }
-
+    if (cpf) {
+      const cpfExists = await User.findOne({ cpf });
+      if (cpfExists) {
+        const error = new Error("CPF já cadastrado");
+        error.statusCode = 400;
+        throw error;
+      }
+    }
     const user = await User.create({
       name,
       email,
       password,
       role: role || "employee",
+      cpf,
     });
 
     const token = generateToken(user._id);
@@ -27,6 +36,7 @@ class AuthService {
         name: user.name,
         email: user.email,
         role: user.role,
+        cpf: user.cpf,
       },
       token,
     };
@@ -38,6 +48,7 @@ class AuthService {
     if (!email || !password) {
       const error = new Error("Por favor, forneça email e senha");
       error.statusCode = 400;
+
       throw error;
     }
 

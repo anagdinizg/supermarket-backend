@@ -1,13 +1,10 @@
 import mongoose from "mongoose";
+
 import bcrypt from "bcryptjs";
 
 const userSchema = new mongoose.Schema(
   {
-    name: {
-      type: String,
-      required: [true, "Nome é obrigatório"],
-      trim: true,
-    },
+    name: { type: String, required: [true, "Nome é obrigatório"], trim: true },
     email: {
       type: String,
       required: [true, "Email é obrigatório"],
@@ -15,6 +12,12 @@ const userSchema = new mongoose.Schema(
       lowercase: true,
       trim: true,
       match: [/^\S+@\S+\.\S+$/, "Email inválido"],
+    },
+    cpf: {
+      type: String,
+      unique: true,
+      sparse: true,
+      trim: true,
     },
     password: {
       type: String,
@@ -27,20 +30,11 @@ const userSchema = new mongoose.Schema(
       enum: ["admin", "employee", "manager"],
       default: "employee",
     },
-    profileImage: {
-      type: String,
-      default: null,
-    },
-    isActive: {
-      type: Boolean,
-      default: true,
-    },
+    isActive: { type: Boolean, default: true },
   },
-  {
-    timestamps: true,
-  }
+  { timestamps: true }
 );
-
+userSchema.index({ cpf: 1 });
 userSchema.pre("save", async function (next) {
   if (!this.isModified("password")) {
     return next();

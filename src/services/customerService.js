@@ -52,7 +52,7 @@ class CustomerService {
       throw error;
     }
 
-    const { name, email, phone, cpf, address } = customerData;
+    const { name, email, phone, cpf, address, age } = customerData;
 
     if (!name || !email) {
       const error = new Error("Nome e email são obrigatórios");
@@ -60,7 +60,11 @@ class CustomerService {
       throw error;
     }
 
-    const existingCustomer = await Customer.findOne({ email, active: true });
+    const existingCustomer = await Customer.findOne({
+      email,
+      active: true,
+    });
+
     if (existingCustomer) {
       const error = new Error("Email já cadastrado");
       error.statusCode = 409;
@@ -76,6 +80,12 @@ class CustomerService {
       }
     }
 
+    if (age !== undefined && age !== null && (age < 1 || age > 150)) {
+      const error = new Error("Idade deve estar entre 1 e 150 anos");
+      error.statusCode = 400;
+      throw error;
+    }
+
     try {
       const customer = await Customer.create({
         name,
@@ -83,6 +93,7 @@ class CustomerService {
         phone,
         cpf,
         address,
+        age: age ? parseInt(age) : null,
       });
 
       return customer;
@@ -112,7 +123,7 @@ class CustomerService {
       throw error;
     }
 
-    const { name, email, phone, cpf, address, active } = updateData;
+    const { name, email, phone, cpf, address, active, age } = updateData;
 
     const customer = await Customer.findById(customerId);
 
@@ -134,7 +145,6 @@ class CustomerService {
         active: true,
         _id: { $ne: customerId },
       });
-
       if (existingCustomer) {
         const error = new Error("Email já cadastrado");
         error.statusCode = 409;
@@ -148,12 +158,17 @@ class CustomerService {
         active: true,
         _id: { $ne: customerId },
       });
-
       if (existingCPF) {
         const error = new Error("CPF já cadastrado");
         error.statusCode = 409;
         throw error;
       }
+    }
+
+    if (age !== undefined && age !== null && (age < 1 || age > 150)) {
+      const error = new Error("Idade deve estar entre 1 e 150 anos");
+      error.statusCode = 400;
+      throw error;
     }
 
     if (name) customer.name = name;
@@ -162,6 +177,11 @@ class CustomerService {
     if (cpf !== undefined) customer.cpf = cpf;
     if (address !== undefined) customer.address = address;
     if (typeof active === "boolean") customer.active = active;
+    if (age !== undefined && age !== null && age !== "") {
+      customer.age = parseInt(age);
+    } else if (age === "" || age === null) {
+      customer.age = null;
+    }
 
     try {
       await customer.save();

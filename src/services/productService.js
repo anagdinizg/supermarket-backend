@@ -10,12 +10,7 @@ class ProductService {
       const finalPrice = hasPromotion
         ? product.promotionalPrice
         : product.price;
-
-      return {
-        ...product,
-        finalPrice,
-        hasPromotion,
-      };
+      return { ...product, finalPrice, hasPromotion };
     });
 
     return productsWithPromotion;
@@ -33,18 +28,19 @@ class ProductService {
     const hasPromotion =
       product.promotionalPrice && product.promotionalPrice < product.price;
     const finalPrice = hasPromotion ? product.promotionalPrice : product.price;
-
-    return {
-      ...product,
-      finalPrice,
-      hasPromotion,
-    };
+    return { ...product, finalPrice, hasPromotion };
   }
 
   async createProduct(productData, file, userRole) {
-    const { name, description, price, promotionalPrice, stock, category } =
-      productData;
-
+    const {
+      name,
+      description,
+      price,
+      promotionalPrice,
+      stock,
+      category,
+      expirationDate,
+    } = productData;
     if (!["admin", "manager", "employee"].includes(userRole)) {
       const error = new Error(
         "Apenas admin, manager e employee podem criar produtos"
@@ -84,6 +80,7 @@ class ProductService {
       promotionalPrice: promotionalPrice ? parseFloat(promotionalPrice) : null,
       stock: stock ? parseInt(stock) : 0,
       category,
+      expirationDate: expirationDate ? new Date(expirationDate) : null,
     };
 
     const product = await Product.create(newProductData);
@@ -99,6 +96,7 @@ class ProductService {
       stock,
       category,
       active,
+      expirationDate,
     } = updateData;
 
     if (!["admin", "manager", "employee"].includes(userRole)) {
@@ -127,6 +125,7 @@ class ProductService {
           "Apenas admin e manager podem gerenciar promoções"
         );
         error.statusCode = 403;
+
         throw error;
       }
 
@@ -155,7 +154,9 @@ class ProductService {
     if (stock !== undefined) product.stock = parseInt(stock);
     if (category !== undefined) product.category = category;
     if (typeof active === "boolean") product.active = active;
-
+    if (expirationDate !== undefined) {
+      product.expirationDate = expirationDate ? new Date(expirationDate) : null;
+    }
     await product.save();
     return product;
   }
