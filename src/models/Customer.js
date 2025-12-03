@@ -24,6 +24,12 @@ const customerSchema = new mongoose.Schema(
       sparse: true,
       trim: true,
     },
+    age: {
+      type: Number,
+      min: [1, "Idade deve ser maior que zero"],
+      max: [150, "Idade deve ser menor que 150"],
+      required: false,
+    },
     address: {
       type: String,
       trim: true,

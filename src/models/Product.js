@@ -30,6 +30,10 @@ const productSchema = new mongoose.Schema(
       type: String,
       trim: true,
     },
+    expirationDate: {
+      type: Date,
+      required: false,
+    },
     image: {
       type: String,
     },

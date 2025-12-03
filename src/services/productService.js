@@ -42,8 +42,15 @@ class ProductService {
   }
 
   async createProduct(productData, file, userRole) {
-    const { name, description, price, promotionalPrice, stock, category } =
-      productData;
+    const {
+      name,
+      description,
+      price,
+      promotionalPrice,
+      stock,
+      category,
+      expirationDate,
+    } = productData;
 
     if (!["admin", "manager", "employee"].includes(userRole)) {
       const error = new Error(
@@ -84,6 +91,7 @@ class ProductService {
       promotionalPrice: promotionalPrice ? parseFloat(promotionalPrice) : null,
       stock: stock ? parseInt(stock) : 0,
       category,
+      expirationDate: expirationDate ? new Date(expirationDate) : null,
     };
 
     const product = await Product.create(newProductData);
@@ -99,6 +107,7 @@ class ProductService {
       stock,
       category,
       active,
+      expirationDate,
     } = updateData;
 
     if (!["admin", "manager", "employee"].includes(userRole)) {
@@ -155,6 +164,9 @@ class ProductService {
     if (stock !== undefined) product.stock = parseInt(stock);
     if (category !== undefined) product.category = category;
     if (typeof active === "boolean") product.active = active;
+    if (expirationDate !== undefined) {
+      product.expirationDate = expirationDate ? new Date(expirationDate) : null;
+    }
 
     await product.save();
     return product;
