@@ -3,7 +3,6 @@ import cors from "cors";
 import helmet from "helmet";
 import dotenv from "dotenv";
 import rateLimit from "express-rate-limit";
-import path from "path";
 import { fileURLToPath } from "url";
 
 import connectDB from "./src/config/database.js";
@@ -18,7 +17,6 @@ import { errorHandler } from "./src/middleware/errorHandler.js";
 dotenv.config();
 
 const __filename = fileURLToPath(import.meta.url);
-const __dirname = path.dirname(__filename);
 
 connectDB();
 

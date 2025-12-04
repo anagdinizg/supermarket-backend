@@ -27,7 +27,7 @@ class UserService {
   }
 
   async updateUser(userId, updateData, requestingUserId, requestingUserRole) {
-    const { name, email, role, isActive } = updateData;
+    const { name, email, role, isActive, cpf } = updateData;
 
     const user = await User.findById(userId);
 
@@ -35,6 +35,19 @@ class UserService {
       const error = new Error("Usuário não encontrado");
       error.statusCode = 404;
       throw error;
+    }
+
+    if (cpf && cpf !== user.cpf) {
+      const cpfExists = await User.findOne({
+        cpf,
+        _id: { $ne: userId },
+      });
+
+      if (cpfExists) {
+        const error = new Error("CPF já cadastrado");
+        error.statusCode = 409;
+        throw error;
+      }
     }
 
     const isSelf = userId === requestingUserId.toString();
@@ -81,6 +94,7 @@ class UserService {
 
     if (name) user.name = name;
     if (email) user.email = email;
+    if (cpf !== undefined) user.cpf = cpf;
 
     await user.save();
 

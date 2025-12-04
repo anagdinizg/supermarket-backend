@@ -16,6 +16,12 @@ const userSchema = new mongoose.Schema(
       trim: true,
       match: [/^\S+@\S+\.\S+$/, "Email inválido"],
     },
+    cpf: {
+      type: String,
+      unique: true,
+      sparse: true,
+      trim: true,
+    },
     password: {
       type: String,
       required: [true, "Senha é obrigatória"],
@@ -27,10 +33,6 @@ const userSchema = new mongoose.Schema(
       enum: ["admin", "employee", "manager"],
       default: "employee",
     },
-    profileImage: {
-      type: String,
-      default: null,
-    },
     isActive: {
       type: Boolean,
       default: true,
@@ -40,6 +42,8 @@ const userSchema = new mongoose.Schema(
     timestamps: true,
   }
 );
+
+userSchema.index({ cpf: 1 });
 
 userSchema.pre("save", async function (next) {
   if (!this.isModified("password")) {

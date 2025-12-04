@@ -6,9 +6,6 @@ node_modules/
 .env.local
 .env.*.local
 
-# Uploads
-uploads/
-
 # Logs
 logs
 *.log

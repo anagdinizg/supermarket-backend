@@ -12,11 +12,21 @@ class AuthService {
       throw error;
     }
 
+    if (cpf) {
+      const cpfExists = await User.findOne({ cpf });
+      if (cpfExists) {
+        const error = new Error("CPF já cadastrado");
+        error.statusCode = 400;
+        throw error;
+      }
+    }
+
     const user = await User.create({
       name,
       email,
       password,
       role: role || "employee",
+      cpf,
     });
 
     const token = generateToken(user._id);
@@ -27,6 +37,7 @@ class AuthService {
         name: user.name,
         email: user.email,
         role: user.role,
+        cpf: user.cpf,
       },
       token,
     };
