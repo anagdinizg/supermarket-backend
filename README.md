@@ -1,4 +1,4 @@
-# Supermercado Backend
+# Supermercado — Backend
 
 Backend de exemplo para um sistema de supermercado (API REST) em Node.js + Express + MongoDB.
 
